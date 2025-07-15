@@ -88,22 +88,39 @@ class ValkeySearchNGT(BaseANN):
                 p.reset()
         p.execute()
 
-    def set_query_arguments(self, epsilon):
-        # Handle single epsilon value like PANNG algorithm
-        print(f"ValkeySearchNGT: epsilon={epsilon}")
-        # Convert epsilon like NGT algorithms: epsilon = epsilon - 1.0
-        self.epsilon = epsilon - 1.0
-        # Update the epsilon_for_search for the next index creation
-        self.epsilon_for_search = self.epsilon
-        self.name = f"ValkeySearchNGT(edge_creation={self.edge_size_for_creation}, edge_search={self.edge_size_for_search}, epsilon={epsilon})"
+        # Explicitly trigger index creation after all vectors are added
+        print("[WARMUP] Issuing dummy KNN query to trigger NGT index build...")
+        import numpy as np
+        zero_vec = np.zeros(X.shape[1], dtype=np.float32)
+        try:
+            self.query(zero_vec, 1)
+            print("[WARMUP] Index build triggered via dummy query.")
+        except Exception as e:
+            print(f"[WARMUP] Dummy query for index build failed: {e}")
+
+        # Optionally, trigger optimizer with a second dummy query
+        print("[WARMUP] Issuing second dummy KNN query to trigger optimizer (if supported)...")
+        try:
+            self.query(zero_vec, 1)
+            print("[WARMUP] Optimizer triggered via dummy query.")
+        except Exception as e:
+            print(f"[WARMUP] Dummy query for optimizer failed: {e}")
+
+        print("[IMPORTANT] All vectors inserted. Index build and optimizer triggered via warmup queries.")
+
+    def set_query_arguments(self, accuracy):
+        # Handle accuracy value (0.8-0.95) for NGT search
+        print(f"ValkeySearchNGT: accuracy={accuracy}")
+        self.accuracy = accuracy
+        self.name = f"ValkeySearchNGT(edge_creation={self.edge_size_for_creation}, edge_search={self.edge_size_for_search}, accuracy={accuracy})"
 
     def query(self, v, n):
-        # Use runtime epsilon if available, otherwise use default
-        epsilon_param = f" EPSILON {self.epsilon}" if hasattr(self, 'epsilon') else ""
+        # Use runtime accuracy if available, otherwise use default
+        accuracy_param = f" ACCURACY {self.accuracy}" if hasattr(self, 'accuracy') else ""
         q = [
             "FT.SEARCH",
             self.index_name,
-            f"*=>[KNN {n} @{self.field_name} $BLOB{epsilon_param}]",
+            f"*=>[KNN {n} @{self.field_name} $BLOB{accuracy_param}]",
             "NOCONTENT",
             "LIMIT",
             "0",
@@ -136,4 +153,4 @@ class ValkeySearchNGT(BaseANN):
         return []
 
     def __str__(self):
-        return f"ValkeySearchNGT(edge_creation={self.edge_size_for_creation}, edge_search={self.edge_size_for_search}, epsilon={self.epsilon + 1.0})" 
+        return f"ValkeySearchNGT(edge_creation={self.edge_size_for_creation}, edge_search={self.edge_size_for_search}, accuracy={getattr(self, 'accuracy', 'N/A')})" 

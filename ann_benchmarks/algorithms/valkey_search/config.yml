@@ -8,11 +8,11 @@ float:
     name: valkey_search_ngt
     run_groups:
       high_recall:
-        args: [{edge_size_for_creation: 60, edge_size_for_search: 80, epsilon_for_creation: 0.1, epsilon_for_search: 0.1}]
-        query_args: [[0.6, 0.8, 0.9, 1.0, 1.02, 1.05, 1.1, 1.2, 1.5, 2.0]]
+        args: [{edge_size_for_creation: 80, edge_size_for_search: 100, epsilon_for_creation: 0.1, epsilon_for_search: 0.1}]
+        query_args: [[0.8, 0.85, 0.9, 0.95]]
       medium_recall:
-        args: [{edge_size_for_creation: 40, edge_size_for_search: 60, epsilon_for_creation: 0.08, epsilon_for_search: 0.08}]
-        query_args: [[0.6, 0.8, 0.9, 1.0, 1.02, 1.05, 1.1, 1.2, 1.5, 2.0]]
+        args: [{edge_size_for_creation: 60, edge_size_for_search: 80, epsilon_for_creation: 0.08, epsilon_for_search: 0.08}]
+        query_args: [[0.8, 0.85, 0.9, 0.95]]
       balanced:
-        args: [{edge_size_for_creation: 30, edge_size_for_search: 50, epsilon_for_creation: 0.06, epsilon_for_search: 0.06}]
-        query_args: [[0.6, 0.8, 0.9, 1.0, 1.02, 1.05, 1.1, 1.2, 1.5, 2.0]] 
+        args: [{edge_size_for_creation: 40, edge_size_for_search: 60, epsilon_for_creation: 0.06, epsilon_for_search: 0.06}]
+        query_args: [[0.8, 0.85, 0.9, 0.95]] 
